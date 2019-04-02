@@ -13,7 +13,6 @@ class RectangleObject extends ObjectClass implements Serializable {
     public int layoutX;
     public int layoutY;
 
-
     public Rectangle rectangleObject(int valueHeight, int valueWidth) {
 
         this.valueHeight = valueHeight;
