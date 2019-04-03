@@ -264,9 +264,9 @@ public class Main extends Application {
 
         try {
            if (type=='r') {
-               return (ObjectClass) Class.forName("com.RectangleObject").newInstance();
+               return (ObjectClass) Class.forName("src.java.com.RectangleObject").newInstance();
            }else if (type=='c'){
-               return (ObjectClass) Class.forName("com.CirclObject").newInstance();
+               return (ObjectClass) Class.forName("src.java.com.CirclObject").newInstance();
            }
         } catch (InstantiationException e) {
             e.printStackTrace();
