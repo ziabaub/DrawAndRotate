@@ -18,6 +18,7 @@ public class FileReader {
         for (int i = 0; i < bArray.length; i++) {
             System.out.print((char) bArray[i]);
         }
+
         return bArray;
     }
 

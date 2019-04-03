@@ -19,15 +19,21 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
 
-public class Main extends Application {
+public class Demo extends Application {
 
     private static final String ACTION_1 = "data.xml";
-    private final String PATH_RESOURCES = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/outResources/";
+    private final String PATH_RESOURCES = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/outResources/";
     private final String PATH_DESTINATION = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/com/";
     private final String alphabet = "[a-zA-Z]+";
     private final String numeric = "[0-9]+";
@@ -227,7 +233,7 @@ public class Main extends Application {
         int r = 0;
         int height;
         int width;
-        getSources();
+        //getSources();
         ObjectClass objectClass = null;
 
         while (counter != 0) {
@@ -239,6 +245,8 @@ public class Main extends Application {
                 width = objectClasses.getRectangles().get(r).getValueWidth();
 
                 Rectangle rectangle = (Rectangle) objectClass.createObject(height, width);
+                rectangle.setLayoutX(objectClasses.getRectangles().get(r).getLayoutX());
+                rectangle.setLayoutY(objectClasses.getRectangles().get(r).getLayoutY());
                 rectangles.add(rectangle);
                 pane.getChildren().add(rectangle);
                 rotateCounter++;
@@ -265,16 +273,45 @@ public class Main extends Application {
         try {
             if (type == 'r') {
 
-                return (ObjectClass) Class.forName("com.RectangleObject").newInstance();
+
+                File file = new File("/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/com");
+
+                    // Convert File to a URL
+                    URL url = file.toURI().toURL();          // file:/c:/myclasses/
+                    URL[] urls = new URL[]{url};
+
+                    // Create a new class loader with the directory
+                    ClassLoader cl = new URLClassLoader(urls);
+
+                    // Load in the class; MyClass.class should be located in
+                    // the directory file:/c:/myclasses/com/mycompany
+                    Class cls = cl.loadClass("com.RectangleObject");
+
+
+
+
+
+
+
+//                ClassLoader classLoader = this.getClass().getClassLoader();
+//                Class loadedMyClass = classLoader.loadClass("com.RectangleObject");
+//
+//                // Create a new instance from the loaded class
+//                Constructor constructor = loadedMyClass.getConstructor();
+//                Object myClassObject = constructor.newInstance();
+//                return  (ObjectClass) myClassObject;
+               // return (ObjectClass) Class.forName("outResources.RectangleObject").newInstance();
             } else if (type == 'c') {
 
-                return (ObjectClass) Class.forName("com.CirclObject").newInstance();
+                return (ObjectClass) Class.forName("outResources.CirclObject").newInstance();
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }  catch (MalformedURLException e) {
             e.printStackTrace();
         }
         return null;
@@ -334,7 +371,7 @@ public class Main extends Application {
 
     private void addObject(ObjectClass objectClass, boolean b, char type) {
 
-        if (((rectangles == null) && (type == 'r'))) {
+        if (((rectanglesObjects == null) && (type == 'r'))) {
 
             Rectangle rectangle;
             if (!b) {
@@ -350,7 +387,7 @@ public class Main extends Application {
             rectanglesObjects.add(objectClass);
             generateLayouts();
             rotateCounter++;
-        } else if ((circles == null) && (type == 'c')) {
+        } else if ((circlesObjects == null) && (type == 'c')) {
 
             Circle circle;
             if (!b) {
@@ -454,6 +491,8 @@ public class Main extends Application {
         pane.getChildren().clear();
         rectangles = null;
         circles = null;
+        rectanglesObjects=null;
+        circlesObjects=null;
         priority = "";
         layoutX = 100;
         layoutY = 70;
@@ -465,14 +504,14 @@ public class Main extends Application {
         objectListHandlerTem.setRectangles(rectanglesObjects);
         objectListHandlerTem.setCircles(circlesObjects);
         objectListHandlerTem.setPriorety(priority);
-        if ((rectanglesObjects != null) && (circlesObjects != null)) {
+      //  if ((rectanglesObjects != null) && (circlesObjects != null)) {
             try {
                 XmlMapper xmlMapper = new XmlMapper();
                 xmlMapper.writeValue(new File(ACTION_1), objectListHandlerTem);
             } catch (FileNotFoundException e) {
                 System.out.println(e.getMessage());
             }
-        }
+      //  }
     }
 
     public void init() throws IOException {

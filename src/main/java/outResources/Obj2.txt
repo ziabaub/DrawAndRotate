@@ -2,10 +2,9 @@ package com;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import java.io.Serializable;
 
-class RectangleObject extends ObjectClass implements Serializable {
+public class RectangleObject extends ObjectClass implements Serializable {
 
 
 

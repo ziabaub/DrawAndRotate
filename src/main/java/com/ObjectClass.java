@@ -11,11 +11,11 @@ public class ObjectClass implements Serializable {
     public int red;
     public int green;
     public int blue;
-    int valueHeight;
-    int valueWidth;
-    int radius;
-    int layoutX;
-    int layoutY;
+    public int valueHeight;
+    public int valueWidth;
+    public int radius;
+    public int layoutX;
+    public int layoutY;
 
 
     public ObjectClass(int radius) {
@@ -51,7 +51,7 @@ public class ObjectClass implements Serializable {
 
     }
 
-    Paint getPaint() {
+    protected Paint getPaint() {
         return Color.rgb(red, green, blue);
     }
 
