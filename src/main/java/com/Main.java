@@ -27,7 +27,7 @@ import java.util.ArrayList;
 public class Main extends Application {
 
     private static final String ACTION_1 = "data.xml";
-    private final String PATH_RESOURCES ="/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/outResources/";
+    private final String PATH_RESOURCES = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/outResources/";
     private final String PATH_DESTINATION = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/com/";
     private final String alphabet = "[a-zA-Z]+";
     private final String numeric = "[0-9]+";
@@ -163,11 +163,11 @@ public class Main extends Application {
         VBox buttons = new VBox(10);
         buttons.setLayoutX(570);
         buttons.setLayoutY(470);
-        buttons.getChildren().addAll(classLoader,createObject, rotateObject, clear, saveObject);
+        buttons.getChildren().addAll(classLoader, createObject, rotateObject, clear, saveObject);
 
         if (init) {
             createOtherSceneContents();
-            contentsCreated =true;
+            contentsCreated = true;
             generateObjects(objectListHandler);
         }
         paneContents.getChildren().add(buttons);
@@ -218,7 +218,7 @@ public class Main extends Application {
         paneContents.getChildren().addAll(toggleBox, pane);
     }
 
-    private void generateObjects(ObjectListHandler objectClasses)  {
+    private void generateObjects(ObjectListHandler objectClasses) {
         rectangles = new ArrayList<>();
         circles = new ArrayList<>();
         int counter = priority.length();
@@ -238,7 +238,7 @@ public class Main extends Application {
                 height = objectClasses.getRectangles().get(r).getValueHeight();
                 width = objectClasses.getRectangles().get(r).getValueWidth();
 
-                Rectangle rectangle = (Rectangle) objectClass.createObject(height,width);
+                Rectangle rectangle = (Rectangle) objectClass.createObject(height, width);
                 rectangles.add(rectangle);
                 pane.getChildren().add(rectangle);
                 rotateCounter++;
@@ -259,15 +259,17 @@ public class Main extends Application {
         }
     }
 
-    private ObjectClass getObject(char type ) {
+    private ObjectClass getObject(char type) {
 
 
         try {
-           if (type=='r') {
-               return (ObjectClass) Class.forName("src.java.com.RectangleObject").newInstance();
-           }else if (type=='c'){
-               return (ObjectClass) Class.forName("src.java.com.CirclObject").newInstance();
-           }
+            if (type == 'r') {
+
+                return (ObjectClass) Class.forName("com.RectangleObject").newInstance();
+            } else if (type == 'c') {
+
+                return (ObjectClass) Class.forName("com.CirclObject").newInstance();
+            }
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -275,7 +277,7 @@ public class Main extends Application {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return  null;
+        return null;
     }
 
     private void setRectangleLayouts(Rectangle rectangle, ObjectClass objectClass) {
@@ -301,12 +303,12 @@ public class Main extends Application {
 
 
     private void createObject() {
-        ObjectClass objectClass ;
+        ObjectClass objectClass;
 
         if (toggleGroup.getSelectedToggle() == tbRectan) {
             chooseItRectangle = true;
             priority += 'r';
-                objectClass = getObject('r');
+            objectClass = getObject('r');
 
             addObject(objectClass, checkInputRectangle(), 'r');//
 
@@ -314,19 +316,19 @@ public class Main extends Application {
             priority += 'c';
 
 
-                objectClass = getObject('c');
+            objectClass = getObject('c');
 
             addObject(objectClass, checkInputCircle(), 'c');
         }
     }
 
-    private void getSources(){
-        FileReader fileReader=new FileReader();
-        byte[] circlObject = fileReader.readFile(PATH_RESOURCES+"CirclObject.txt");
-        byte[] rectangleObject=  fileReader.readFile(PATH_RESOURCES+"RectangleObject.txt");
-        FileWriter fileWriter=new FileWriter();
-        fileWriter.writeByte(circlObject,PATH_DESTINATION+"CirclObject.java");
-        fileWriter.writeByte(rectangleObject,PATH_DESTINATION+"RectangleObject.java");
+    private void getSources() {
+        FileReader fileReader = new FileReader();
+        byte[] circlObject = fileReader.readFile(PATH_RESOURCES + "Obj1.txt");
+        byte[] rectangleObject = fileReader.readFile(PATH_RESOURCES + "Obj2.txt");
+        FileWriter fileWriter = new FileWriter();
+        fileWriter.writeByte(circlObject, PATH_DESTINATION + "CirclObject.java");
+        fileWriter.writeByte(rectangleObject, PATH_DESTINATION + "RectangleObject.java");
 
     }
 
@@ -365,28 +367,28 @@ public class Main extends Application {
         } else {
             if (type == 'r') {
 
-                regenerateLastObject(objectClass, b,type);
+                regenerateLastObject(objectClass, b, type);
                 rotateCounter++;
             } else {
 
-                regenerateLastObject(objectClass, b,type);
+                regenerateLastObject(objectClass, b, type);
 
             }
 
         }
     }
 
-    private void regenerateLastObject(ObjectClass objectClass, boolean size,char type ) {
+    private void regenerateLastObject(ObjectClass objectClass, boolean size, char type) {
 
 
         int width = 0;
         int height = 0;
         int radius = 0;
         if (!size) {
-            objectClass = generateNew(objectClass,type);
+            objectClass = generateNew(objectClass, type);
         } else {
 
-            if (type=='r') {
+            if (type == 'r') {
                 width = Integer.valueOf(recWidth.getText());
                 height = Integer.valueOf(recHeight.getText());
                 objectClass.setValueHeight(height);
@@ -396,7 +398,7 @@ public class Main extends Application {
                 objectClass.setRadius(radius);
             }
         }
-        if (type=='r') {
+        if (type == 'r') {
             Rectangle rectangle = (Rectangle) objectClass.createObject();
             setRectangleLayouts(rectangle, objectClass);
             pane.getChildren().add(rectangle);
@@ -414,18 +416,18 @@ public class Main extends Application {
 
     }
 
-    public ObjectClass generateNew(ObjectClass objectClass,char type){
+    public ObjectClass generateNew(ObjectClass objectClass, char type) {
         ObjectClass o;
-        if (type=='r'){
-             o =rectanglesObjects.get(rectangles.size() - 1);
-            int height = o.getValueHeight()-((o.getValueHeight()*10)/100);
-            int width = o.getValueWidth()-((o.getValueWidth()*10)/100);
+        if (type == 'r') {
+            o = rectanglesObjects.get(rectangles.size() - 1);
+            int height = o.getValueHeight() - ((o.getValueHeight() * 10) / 100);
+            int width = o.getValueWidth() - ((o.getValueWidth() * 10) / 100);
             objectClass.setValueHeight(height);
             objectClass.setValueWidth(width);
             return objectClass;
-        }else{
-            o= circlesObjects.get(circles.size() - 1);
-            int radius = (o.getRadius()-(o.getRadius()*10/100));
+        } else {
+            o = circlesObjects.get(circles.size() - 1);
+            int radius = (o.getRadius() - (o.getRadius() * 10 / 100));
             objectClass.setRadius(radius);
             return objectClass;
 
@@ -463,7 +465,7 @@ public class Main extends Application {
         objectListHandlerTem.setRectangles(rectanglesObjects);
         objectListHandlerTem.setCircles(circlesObjects);
         objectListHandlerTem.setPriorety(priority);
-        if ((rectanglesObjects !=null )&&(circlesObjects!=null)) {
+        if ((rectanglesObjects != null) && (circlesObjects != null)) {
             try {
                 XmlMapper xmlMapper = new XmlMapper();
                 xmlMapper.writeValue(new File(ACTION_1), objectListHandlerTem);
