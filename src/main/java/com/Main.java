@@ -27,7 +27,7 @@ import java.util.ArrayList;
 public class Main extends Application {
 
     private static final String ACTION_1 = "data.xml";
-    private final String PATH_RESOURCES ="/Users/ziadelsarrih/Desktop/Labs/OOP/outResources/";
+    private final String PATH_RESOURCES ="/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/outResources/";
     private final String PATH_DESTINATION = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/com/";
     private final String alphabet = "[a-zA-Z]+";
     private final String numeric = "[0-9]+";
