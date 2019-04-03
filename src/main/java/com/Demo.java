@@ -17,14 +17,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import net.openhft.compiler.CompilerUtils;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -33,14 +28,16 @@ import java.util.ArrayList;
 public class Demo extends Application {
 
     private static final String ACTION_1 = "data.xml";
-    private final String PATH_RESOURCES = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/outResources/";
-    private final String PATH_DESTINATION = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/com/";
-    private final String alphabet = "[a-zA-Z]+";
-    private final String numeric = "[0-9]+";
+    private static final String A_Z_A_Z = "[a-zA-Z]+";
+    private static final String NUMERIC = "[0-9]+";
     private boolean chooseItRectangle = false;
+    private boolean getContentsCreated = false;
     private boolean init = false;
     private boolean contentsCreated = false;
+    private String object;
+    private String object2;
     private int layoutX = 100;
+
     private int layoutY = 70;
     private int degree = 5;
     private int rotateCounter = 0;
@@ -65,10 +62,12 @@ public class Demo extends Application {
     private TextField recHeight;
     private TextField rCircle;
     private TextField index;
+    private Class aClass;
+    private Class aClass2;
 
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws IllegalAccessException, InstantiationException {
         pane = new BorderPane();
         paneContents = new Pane();
         pane.setPrefWidth(450);
@@ -80,11 +79,24 @@ public class Demo extends Application {
         createObject.setOnAction(event -> {
             if (!contentsCreated) {
                 createOtherSceneContents();
+                if (!getContentsCreated) {
+                    getSources();
+                }
+                getObject('r');
+                getObject('c');
             }
-            createObject();
+            try {
+                createObject();
+            } catch (IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
+            }
         });
 
-        classLoader.setOnAction(event -> getSources());
+        classLoader.setOnAction(event -> {
+            if (!getContentsCreated) {
+                getSources();
+            }
+        });
 
         rotateObject.setOnAction(event -> rotateObject());
 
@@ -108,7 +120,7 @@ public class Demo extends Application {
 
     private void editObject() {
         String inputIndex = index.getText();
-        if ((!inputIndex.isEmpty()) && (!inputIndex.matches(alphabet))) {
+        if ((!inputIndex.isEmpty()) && (!inputIndex.matches(A_Z_A_Z))) {
             int indexObject = Integer.valueOf(index.getText());
             if (toggleGroup.getSelectedToggle() == tbRectan) {
 
@@ -136,10 +148,10 @@ public class Demo extends Application {
         String width = recWidth.getText();
         String height = recHeight.getText();
         if ((width.isEmpty()) || (height.isEmpty())
-                || (width.matches(alphabet))
-                || (height.matches(alphabet))
-                || (width.matches(numeric) && width.length() > 3)
-                || (height.matches(numeric) && height.length() > 3)) {
+                || (width.matches(A_Z_A_Z))
+                || (height.matches(A_Z_A_Z))
+                || (width.matches(NUMERIC) && width.length() > 3)
+                || (height.matches(NUMERIC) && height.length() > 3)) {
             return false;
         } else {
             return true;
@@ -149,15 +161,15 @@ public class Demo extends Application {
     private boolean checkInputCircle() {
         String rCircl = rCircle.getText();
         if ((rCircl.isEmpty())
-                || (rCircl.matches(alphabet))
-                || (rCircl.matches(numeric) && rCircl.length() > 3)) {
+                || (rCircl.matches(A_Z_A_Z))
+                || (rCircl.matches(NUMERIC) && rCircl.length() > 3)) {
             return false;
         } else {
             return true;
         }
     }
 
-    private void createSceneContents() {
+    private void createSceneContents() throws InstantiationException, IllegalAccessException {
 
         createObject = new Button("Create");
         rotateObject = new Button("Rotate");
@@ -174,6 +186,10 @@ public class Demo extends Application {
         if (init) {
             createOtherSceneContents();
             contentsCreated = true;
+            getContentsCreated = true;
+            getSources();
+            getObject('r');
+            getObject('c');
             generateObjects(objectListHandler);
         }
         paneContents.getChildren().add(buttons);
@@ -209,7 +225,7 @@ public class Demo extends Application {
         toggleGroup = new ToggleGroup();
         tbCircle = new ToggleButton("Circle");
         tbCircle.setPrefSize(60, 20);
-        tbRectan = new ToggleButton("Triangle");
+        tbRectan = new ToggleButton("Rectangle");
         tbRectan.setPrefSize(124, 20);
 
         rectangleSizeField.getChildren().addAll(recHeight, recWidth);
@@ -224,7 +240,7 @@ public class Demo extends Application {
         paneContents.getChildren().addAll(toggleBox, pane);
     }
 
-    private void generateObjects(ObjectListHandler objectClasses) {
+    private void generateObjects(ObjectListHandler objectClasses) throws IllegalAccessException, InstantiationException {
         rectangles = new ArrayList<>();
         circles = new ArrayList<>();
         int counter = priority.length();
@@ -233,13 +249,12 @@ public class Demo extends Application {
         int r = 0;
         int height;
         int width;
-        //getSources();
         ObjectClass objectClass = null;
 
         while (counter != 0) {
             if (priority.charAt(k) == 'r') {
 
-                objectClass = getObject('r');
+                objectClass = (ObjectClass) aClass.newInstance();//getObject('r');
 
                 height = objectClasses.getRectangles().get(r).getValueHeight();
                 width = objectClasses.getRectangles().get(r).getValueWidth();
@@ -254,7 +269,7 @@ public class Demo extends Application {
                 r++;
             } else {
 
-                objectClass = getObject('c');
+                objectClass = (ObjectClass) aClass2.newInstance();//getObject('c');
 
 
                 Circle circle = (Circle) objectClass.createObject(objectClasses.getCircles().get(c).getRadius());
@@ -273,45 +288,14 @@ public class Demo extends Application {
         try {
             if (type == 'r') {
 
-
-                File file = new File("/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/com");
-
-                    // Convert File to a URL
-                    URL url = file.toURI().toURL();          // file:/c:/myclasses/
-                    URL[] urls = new URL[]{url};
-
-                    // Create a new class loader with the directory
-                    ClassLoader cl = new URLClassLoader(urls);
-
-                    // Load in the class; MyClass.class should be located in
-                    // the directory file:/c:/myclasses/com/mycompany
-                    Class cls = cl.loadClass("com.RectangleObject");
-
-
-
-
-
-
-
-//                ClassLoader classLoader = this.getClass().getClassLoader();
-//                Class loadedMyClass = classLoader.loadClass("com.RectangleObject");
-//
-//                // Create a new instance from the loaded class
-//                Constructor constructor = loadedMyClass.getConstructor();
-//                Object myClassObject = constructor.newInstance();
-//                return  (ObjectClass) myClassObject;
-               // return (ObjectClass) Class.forName("outResources.RectangleObject").newInstance();
+                aClass = CompilerUtils.CACHED_COMPILER.loadFromJava("com.RectangleObject", object);
+                return (ObjectClass) aClass.newInstance();
             } else if (type == 'c') {
 
-                return (ObjectClass) Class.forName("outResources.CirclObject").newInstance();
+                aClass2 = CompilerUtils.CACHED_COMPILER.loadFromJava("com.CirclObject", object2);
+                return (ObjectClass) aClass2.newInstance();
             }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }  catch (MalformedURLException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;
@@ -339,13 +323,13 @@ public class Demo extends Application {
     }
 
 
-    private void createObject() {
+    private void createObject() throws IllegalAccessException, InstantiationException {
         ObjectClass objectClass;
 
         if (toggleGroup.getSelectedToggle() == tbRectan) {
             chooseItRectangle = true;
             priority += 'r';
-            objectClass = getObject('r');
+            objectClass = (ObjectClass) aClass.newInstance();//getObject('r');
 
             addObject(objectClass, checkInputRectangle(), 'r');//
 
@@ -353,7 +337,7 @@ public class Demo extends Application {
             priority += 'c';
 
 
-            objectClass = getObject('c');
+            objectClass = (ObjectClass) aClass2.newInstance();//getObject('c');
 
             addObject(objectClass, checkInputCircle(), 'c');
         }
@@ -361,11 +345,15 @@ public class Demo extends Application {
 
     private void getSources() {
         FileReader fileReader = new FileReader();
-        byte[] circlObject = fileReader.readFile(PATH_RESOURCES + "Obj1.txt");
-        byte[] rectangleObject = fileReader.readFile(PATH_RESOURCES + "Obj2.txt");
+        String pathRes = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/outResources/";
+        byte[] circlObject = fileReader.readFile(pathRes + "Obj1.txt");
+        byte[] rectangleObject = fileReader.readFile(pathRes + "Obj2.txt");
         FileWriter fileWriter = new FileWriter();
-        fileWriter.writeByte(circlObject, PATH_DESTINATION + "CirclObject.java");
-        fileWriter.writeByte(rectangleObject, PATH_DESTINATION + "RectangleObject.java");
+        object2 = new String(circlObject);
+        object = new String(rectangleObject);
+        String pathDest = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/com/";
+        fileWriter.writeByte(circlObject, pathDest + "CirclObject.java");
+        fileWriter.writeByte(rectangleObject, pathDest + "RectangleObject.java");
 
     }
 
@@ -491,8 +479,8 @@ public class Demo extends Application {
         pane.getChildren().clear();
         rectangles = null;
         circles = null;
-        rectanglesObjects=null;
-        circlesObjects=null;
+        rectanglesObjects = null;
+        circlesObjects = null;
         priority = "";
         layoutX = 100;
         layoutY = 70;
@@ -504,14 +492,14 @@ public class Demo extends Application {
         objectListHandlerTem.setRectangles(rectanglesObjects);
         objectListHandlerTem.setCircles(circlesObjects);
         objectListHandlerTem.setPriorety(priority);
-      //  if ((rectanglesObjects != null) && (circlesObjects != null)) {
-            try {
-                XmlMapper xmlMapper = new XmlMapper();
-                xmlMapper.writeValue(new File(ACTION_1), objectListHandlerTem);
-            } catch (FileNotFoundException e) {
-                System.out.println(e.getMessage());
-            }
-      //  }
+        //  if ((rectanglesObjects != null) && (circlesObjects != null)) {
+        try {
+            XmlMapper xmlMapper = new XmlMapper();
+            xmlMapper.writeValue(new File(ACTION_1), objectListHandlerTem);
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        //  }
     }
 
     public void init() throws IOException {

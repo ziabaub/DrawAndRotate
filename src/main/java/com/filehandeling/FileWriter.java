@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 public class FileWriter {
 
-    public void writeByte(byte[] bytes , String file) {
+    public void writeByte(byte[] bytes, String file) {
         try {
             // Initialize a pointer
             // in file using OutputStream

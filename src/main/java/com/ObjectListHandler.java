@@ -5,9 +5,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class ObjectListHandler implements Serializable {
-    private ArrayList<ObjectClass> rectangles ;
-    private ArrayList<ObjectClass>  circles ;
-    private String priorety ;
+    private ArrayList<ObjectClass> rectangles;
+    private ArrayList<ObjectClass> circles;
+    private String priorety;
 
     public String getPriorety() {
         return priorety;
@@ -32,7 +32,6 @@ public class ObjectListHandler implements Serializable {
     public void setCircles(ArrayList<ObjectClass> circles) {
         this.circles = circles;
     }
-
 
 
 }
