@@ -27,7 +27,8 @@ import java.util.ArrayList;
 public class Main extends Application {
 
     private static final String ACTION_1 = "data.xml";
-    private final String PATH ="/Desktop/Labs/OOP/outResources";
+    private final String PATH_RESOURCES ="/Users/ziadelsarrih/Desktop/Labs/OOP/outResources/";
+    private final String PATH_DESTINATION = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/com/";
     private final String alphabet = "[a-zA-Z]+";
     private final String numeric = "[0-9]+";
     private boolean chooseItRectangle = false;
@@ -53,6 +54,7 @@ public class Main extends Application {
     private Button createObject;
     private Button saveObject;
     private Button edit;
+    private Button classLoader;
     private TextField recWidth;
     private TextField recHeight;
     private TextField rCircle;
@@ -76,6 +78,8 @@ public class Main extends Application {
             createObject();
         });
 
+        classLoader.setOnAction(event -> getSources());
+
         rotateObject.setOnAction(event -> rotateObject());
 
         saveObject.setOnAction(event -> {
@@ -88,6 +92,7 @@ public class Main extends Application {
 
         clear.setOnAction(event -> clearScene());
         edit.setOnAction(event -> editObject());
+
 
         Scene scene = new Scene(paneContents, 650, 650);
         primaryStage.setScene(scene);
@@ -152,20 +157,24 @@ public class Main extends Application {
         rotateObject = new Button("Rotate");
         saveObject = new Button("Save!!");
         clear = new Button("Clear  ");
+        classLoader = new Button("Class.L");
         edit = new Button("Edit ");
 
         VBox buttons = new VBox(10);
         buttons.setLayoutX(570);
-        buttons.setLayoutY(510);
-        buttons.getChildren().addAll(createObject, rotateObject, clear, saveObject);
+        buttons.setLayoutY(470);
+        buttons.getChildren().addAll(classLoader,createObject, rotateObject, clear, saveObject);
 
         if (init) {
+            createOtherSceneContents();
+            contentsCreated =true;
             generateObjects(objectListHandler);
         }
         paneContents.getChildren().add(buttons);
     }
 
     private void createOtherSceneContents() {
+
 
         contentsCreated = true;
         HBox toggleBox = new HBox(20);
@@ -209,24 +218,38 @@ public class Main extends Application {
         paneContents.getChildren().addAll(toggleBox, pane);
     }
 
-    private void generateObjects(ObjectListHandler objectClasses) {
+    private void generateObjects(ObjectListHandler objectClasses)  {
         rectangles = new ArrayList<>();
         circles = new ArrayList<>();
         int counter = priority.length();
         int k = 0;
         int c = 0;
         int r = 0;
+        int height;
+        int width;
+        getSources();
+        ObjectClass objectClass = null;
 
         while (counter != 0) {
             if (priority.charAt(k) == 'r') {
-                Rectangle rectangle = (Rectangle) objectClasses.getRectangles().get(r).createObject();
+
+                objectClass = getObject('r');
+
+                height = objectClasses.getRectangles().get(r).getValueHeight();
+                width = objectClasses.getRectangles().get(r).getValueWidth();
+
+                Rectangle rectangle = (Rectangle) objectClass.createObject(height,width);
                 rectangles.add(rectangle);
                 pane.getChildren().add(rectangle);
                 rotateCounter++;
                 chooseItRectangle = true;
                 r++;
             } else {
-                Circle circle = (Circle) objectClasses.getCircles().get(c).createObject();
+
+                objectClass = getObject('c');
+
+
+                Circle circle = (Circle) objectClass.createObject(objectClasses.getCircles().get(c).getRadius());
                 circles.add(circle);
                 pane.getChildren().add(circle);
                 c++;
@@ -234,6 +257,25 @@ public class Main extends Application {
             k++;
             counter--;
         }
+    }
+
+    private ObjectClass getObject(char type ) {
+
+
+        try {
+           if (type=='r') {
+               return (ObjectClass) Class.forName("com.RectangleObject").newInstance();
+           }else if (type=='c'){
+               return (ObjectClass) Class.forName("com.CirclObject").newInstance();
+           }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return  null;
     }
 
     private void setRectangleLayouts(Rectangle rectangle, ObjectClass objectClass) {
@@ -259,45 +301,32 @@ public class Main extends Application {
 
 
     private void createObject() {
-        ObjectClass objectClass = new ObjectClass();
-        getSources();
+        ObjectClass objectClass ;
+
         if (toggleGroup.getSelectedToggle() == tbRectan) {
             chooseItRectangle = true;
             priority += 'r';
-            try {
-                objectClass = (ObjectClass) Class.forName("Object2").newInstance();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+                objectClass = getObject('r');
+
             addObject(objectClass, checkInputRectangle(), 'r');//
 
         } else if (toggleGroup.getSelectedToggle() == tbCircle) {
             priority += 'c';
 
-            try {
-                objectClass = (ObjectClass) Class.forName("Object1").newInstance();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+
+                objectClass = getObject('c');
+
             addObject(objectClass, checkInputCircle(), 'c');
         }
     }
 
     private void getSources(){
         FileReader fileReader=new FileReader();
-        byte[] object1 = fileReader.readFile(PATH+"Object1.txt");
-        byte[] object2=  fileReader.readFile(PATH+"Object2.txt");
+        byte[] circlObject = fileReader.readFile(PATH_RESOURCES+"CirclObject.txt");
+        byte[] rectangleObject=  fileReader.readFile(PATH_RESOURCES+"RectangleObject.txt");
         FileWriter fileWriter=new FileWriter();
-        fileWriter.writeByte(object1,"Object1.java");
-        fileWriter.writeByte(object2,"Object2.java");
+        fileWriter.writeByte(circlObject,PATH_DESTINATION+"CirclObject.java");
+        fileWriter.writeByte(rectangleObject,PATH_DESTINATION+"RectangleObject.java");
 
     }
 
@@ -336,11 +365,11 @@ public class Main extends Application {
         } else {
             if (type == 'r') {
 
-                regenerateLastObject(rectanglesObjects.get(rectangles.size() - 1), b,type);
+                regenerateLastObject(objectClass, b,type);
                 rotateCounter++;
             } else {
 
-                regenerateLastObject(circlesObjects.get(circles.size() - 1), b,type);
+                regenerateLastObject(objectClass, b,type);
 
             }
 
@@ -349,39 +378,58 @@ public class Main extends Application {
 
     private void regenerateLastObject(ObjectClass objectClass, boolean size,char type ) {
 
-        ObjectClass thisObjectClass;
+
         int width = 0;
         int height = 0;
         int radius = 0;
         if (!size) {
-            thisObjectClass = ObjectGenerating.generateNew(objectClass,type);
+            objectClass = generateNew(objectClass,type);
         } else {
 
             if (type=='r') {
                 width = Integer.valueOf(recWidth.getText());
                 height = Integer.valueOf(recHeight.getText());
-                thisObjectClass = new ObjectClass(height, width);
+                objectClass.setValueHeight(height);
+                objectClass.setValueWidth(width);
             } else {
                 radius = Integer.valueOf(rCircle.getText());
-                thisObjectClass = new ObjectClass(radius);
+                objectClass.setRadius(radius);
             }
         }
         if (type=='r') {
-            Rectangle rectangle = (Rectangle) thisObjectClass.createObject();
-            setRectangleLayouts(rectangle, thisObjectClass);
+            Rectangle rectangle = (Rectangle) objectClass.createObject();
+            setRectangleLayouts(rectangle, objectClass);
             pane.getChildren().add(rectangle);
             rectangles.add(rectangle);
-            rectanglesObjects.add(thisObjectClass);
+            rectanglesObjects.add(objectClass);
             generateLayouts();
         } else {
-            Circle circle = (Circle) thisObjectClass.createObject();
+            Circle circle = (Circle) objectClass.createObject();
             setcirculeLayouts(circle);
             pane.getChildren().add(circle);
             circles.add(circle);
-            circlesObjects.add(thisObjectClass);
+            circlesObjects.add(objectClass);
         }
 
 
+    }
+
+    public ObjectClass generateNew(ObjectClass objectClass,char type){
+        ObjectClass o;
+        if (type=='r'){
+             o =rectanglesObjects.get(rectangles.size() - 1);
+            int height = o.getValueHeight()-((o.getValueHeight()*10)/100);
+            int width = o.getValueWidth()-((o.getValueWidth()*10)/100);
+            objectClass.setValueHeight(height);
+            objectClass.setValueWidth(width);
+            return objectClass;
+        }else{
+            o= circlesObjects.get(circles.size() - 1);
+            int radius = (o.getRadius()-(o.getRadius()*10/100));
+            objectClass.setRadius(radius);
+            return objectClass;
+
+        }
     }
 
 
