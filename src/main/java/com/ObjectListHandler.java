@@ -1,13 +1,12 @@
 package com;
 
-import com.CirclObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class ObjectListHandler implements Serializable {
-    private ArrayList<RectangleObject> rectangles ;
-    private ArrayList<CirclObject>  circles ;
+    private ArrayList<ObjectClass> rectangles ;
+    private ArrayList<ObjectClass>  circles ;
     private String priorety ;
 
     public String getPriorety() {
@@ -18,19 +17,19 @@ public class ObjectListHandler implements Serializable {
         this.priorety = priorety;
     }
 
-    public ArrayList<RectangleObject> getRectangles() {
+    public ArrayList<ObjectClass> getRectangles() {
         return rectangles;
     }
 
-    public void setRectangles(ArrayList<RectangleObject> rectangles) {
+    public void setRectangles(ArrayList<ObjectClass> rectangles) {
         this.rectangles = rectangles;
     }
 
-    public ArrayList<CirclObject> getCircles() {
+    public ArrayList<ObjectClass> getCircles() {
         return circles;
     }
 
-    public void setCircles(ArrayList<CirclObject> circles) {
+    public void setCircles(ArrayList<ObjectClass> circles) {
         this.circles = circles;
     }
 
