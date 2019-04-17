@@ -1,6 +1,7 @@
 package com;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.filehandeling.FileReader;
 import com.filehandeling.FileWriter;
@@ -27,7 +28,8 @@ import java.util.ArrayList;
 
 public class Demo extends Application {
 
-    private static final String ACTION_1 = "data.xml";
+    private static final String DATA_XML = "data.xml";
+    private static final String DATA_JSON = "data.json";
     private static final String A_Z_A_Z = "[a-zA-Z]+";
     private static final String NUMERIC = "[0-9]+";
     private boolean chooseItRectangle = false;
@@ -44,6 +46,9 @@ public class Demo extends Application {
     private ToggleGroup toggleGroup;
     private ToggleButton tbCircle;
     private ToggleButton tbRectan;
+    private ToggleGroup toggleGroup2;
+    private ToggleButton json;
+    private ToggleButton xml;
     private Pane paneContents;
     private BorderPane pane;
     private ArrayList<Rectangle> rectangles;
@@ -181,10 +186,25 @@ public class Demo extends Application {
         classLoader = new Button("Class.L");
         edit = new Button("Edit ");
 
+        toggleGroup2 = new ToggleGroup();
+        json = new ToggleButton("JSon");
+        json.setPrefSize(60, 20);
+        xml = new ToggleButton("Xml");
+        xml.setPrefSize(60, 20);
+
+        json.setToggleGroup(toggleGroup2);
+        xml.setToggleGroup(toggleGroup2);
+        toggleGroup2.selectToggle(xml);
+
+        HBox saveContents = new HBox(10);
+        saveContents.getChildren().addAll(json, xml, saveObject);
+        saveContents.setLayoutX(430);
+        saveContents.setLayoutY(620);
+
         VBox buttons = new VBox(10);
         buttons.setLayoutX(570);
         buttons.setLayoutY(470);
-        buttons.getChildren().addAll(classLoader, createObject, rotateObject, clear, saveObject);
+        buttons.getChildren().addAll(classLoader, createObject, rotateObject, clear);
 
         if (init) {
             createOtherSceneContents();
@@ -195,7 +215,7 @@ public class Demo extends Application {
             getObject('c');
             generateObjects(objectListHandler);
         }
-        paneContents.getChildren().add(buttons);
+        paneContents.getChildren().addAll(buttons, saveContents);
     }
 
     private void createOtherSceneContents() {
@@ -203,6 +223,8 @@ public class Demo extends Application {
 
         contentsCreated = true;
         HBox toggleBox = new HBox(20);
+
+
         toggleBox.setLayoutX(10);
         toggleBox.setLayoutY(10);
 
@@ -231,6 +253,7 @@ public class Demo extends Application {
         tbRectan = new ToggleButton("Rectangle");
         tbRectan.setPrefSize(124, 20);
 
+
         rectangleSizeField.getChildren().addAll(recHeight, recWidth);
         rectangleSize.getChildren().addAll(tbRectan, rectangleSizeField);
         circleRadius.getChildren().addAll(tbCircle, rCircle);
@@ -238,6 +261,7 @@ public class Demo extends Application {
 
         tbCircle.setToggleGroup(toggleGroup);
         tbRectan.setToggleGroup(toggleGroup);
+
 
         toggleBox.getChildren().addAll(rectangleSize, circleRadius, editVBox);
         paneContents.getChildren().addAll(toggleBox, pane);
@@ -347,7 +371,7 @@ public class Demo extends Application {
     }
 
     private void getSources() {
-        getContentsCreated= true;
+        getContentsCreated = true;
         FileReader fileReader = new FileReader();
         String pathRes = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/outResources/";
         byte[] circlObject = fileReader.readFile(pathRes + "Obj1.txt");
@@ -492,37 +516,51 @@ public class Demo extends Application {
     }
 
     private void serializableToXML() throws IOException {
+
         ObjectListHandler objectListHandlerTem = new ObjectListHandler();
         objectListHandlerTem.setRectangles(rectanglesObjects);
         objectListHandlerTem.setCircles(circlesObjects);
         objectListHandlerTem.setPriorety(priority);
-        //  if ((rectanglesObjects != null) && (circlesObjects != null)) {
-        try {
-            XmlMapper xmlMapper = new XmlMapper();
-            xmlMapper.writeValue(new File(ACTION_1), objectListHandlerTem);
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+        if (toggleGroup2.getSelectedToggle() == json) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(new File(DATA_JSON), objectListHandlerTem);
+            File file = new File(DATA_XML);
+            file.delete();
+
+
+        } else {
+            //  if ((rectanglesObjects != null) && (circlesObjects != null)) {
+            try {
+                XmlMapper xmlMapper = new XmlMapper();
+                xmlMapper.writeValue(new File(DATA_XML), objectListHandlerTem);
+                File file = new File(DATA_JSON);
+                file.delete();
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+            //  }
         }
-        //  }
     }
 
     public void init() throws IOException {
-
         priority = "";
-        XmlMapper xmlMapper = new XmlMapper();
-        File file = new File(ACTION_1);
-        // ObjectListHandler objectListHandler = new ObjectListHandler();
+        File file = new File(DATA_JSON);
         if (file.exists()) {
-            String xml = new String(Files.readAllBytes(Paths.get(ACTION_1)));
-            objectListHandler = xmlMapper.readValue(xml, ObjectListHandler.class);
-            init = objectListHandler != null;
-            if (objectListHandler != null) {
-                circlesObjects = objectListHandler.getCircles();
-                rectanglesObjects = objectListHandler.getRectangles();
-                priority = objectListHandler.getPriorety();
-            }
-
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonText = new String(Files.readAllBytes(Paths.get(DATA_JSON)));
+            objectListHandler = objectMapper.readValue(jsonText, ObjectListHandler.class);
+        } else {
+            XmlMapper xmlMapper = new XmlMapper();
+            String xmlText = new String(Files.readAllBytes(Paths.get(DATA_XML)));
+            objectListHandler = xmlMapper.readValue(xmlText, ObjectListHandler.class);
         }
+        init = objectListHandler != null;
+        if (objectListHandler != null) {
+            circlesObjects = objectListHandler.getCircles();
+            rectanglesObjects = objectListHandler.getRectangles();
+            priority = objectListHandler.getPriorety();
+        }
+
 
     }
 
