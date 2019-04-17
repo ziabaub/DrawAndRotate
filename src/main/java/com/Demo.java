@@ -81,12 +81,15 @@ public class Demo extends Application {
                 createOtherSceneContents();
                 if (!getContentsCreated) {
                     getSources();
+
                 }
                 getObject('r');
                 getObject('c');
             }
             try {
-                createObject();
+                if (getContentsCreated) {
+                    createObject();
+                }
             } catch (IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
@@ -344,6 +347,7 @@ public class Demo extends Application {
     }
 
     private void getSources() {
+        getContentsCreated= true;
         FileReader fileReader = new FileReader();
         String pathRes = "/Users/ziadelsarrih/Desktop/Labs/OOP/oop4/src/main/java/outResources/";
         byte[] circlObject = fileReader.readFile(pathRes + "Obj1.txt");
